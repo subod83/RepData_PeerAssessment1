@@ -119,6 +119,8 @@ avg_interval_activity[avg_interval_activity$steps == max(avg_interval_activity$s
 nrow(activity[!complete.cases(activity),])
 ```
 
+###Strategy to fill missing data : Fill in the missing data from the mean for the 5- minute interval
+
 Create a new dataset that is equal to the original dataset but with the missing data filled in with the mean for that 5-minute interval.
 
 ```{r,echo=TRUE}
