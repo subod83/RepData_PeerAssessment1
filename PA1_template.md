@@ -147,6 +147,8 @@ nrow(activity[!complete.cases(activity),])
 ## [1] 2304
 ```
 
+### Strategy to fill missing data : Fill in the missing data from the mean for the 5- minute interval
+
 Create a new dataset that is equal to the original dataset but with the missing data filled in with the mean for that 5-minute interval.
 
 
