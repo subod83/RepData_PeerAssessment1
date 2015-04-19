@@ -13,32 +13,37 @@ Reproducible Research: Peer Assessment 1
 
  Unzip the data file
  
-```{r, echo=TRUE}
+
+```r
 unzip("activity.zip")
 ```
 
  Read the csv file into a data.frame 
  
-```{r, echo=TRUE}
+
+```r
 activity <- read.csv("activity.csv")
 ```
 
  Subset complete observations
  
-```{r, echo=TRUE}
+
+```r
 complete_activity = activity[complete.cases(activity),]
 ```
 
  Transform the data
  
-```{r, echo=TRUE}
+
+```r
 complete_activity <- transform(complete_activity, date = as.Date(complete_activity$date))
 ```
 
 ## What is mean total number of steps taken per day?
 
 Sum the total number of steps taken per day, and generate a histogram
-```{r, echo=TRUE}
+
+```r
 sum_activity <- aggregate(steps~date, complete_activity, sum)
 if (!require("ggplot2",character.only = TRUE))
     {
@@ -46,7 +51,8 @@ if (!require("ggplot2",character.only = TRUE))
       library(ggplot2)
     }
 ```
-```{r,echo=TRUE,results='hide'}
+
+```r
 figure.directory <- "figure"
 if (!file.exists(figure.directory)){
   dir.create(figure.directory)
@@ -65,20 +71,31 @@ dev.off()
 
  Mean of the total number of steps taken per day
 
-```{r, echo=TRUE}
+
+```r
 mean(sum_activity$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
  Median of the total number of steps taken per day
 
-```{r, echo=TRUE}
+
+```r
 median(sum_activity$steps)
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
 
 A time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
-```{r, echo=TRUE}
+
+```r
 ## Create a dataframe with the average number of steps for each 5 minute interval
 avg_interval_activity <- aggregate(steps~interval, complete_activity, mean)
 
@@ -87,7 +104,8 @@ avg_interval_activity <- transform(avg_interval_activity, time_string = paste(as
 
 avg_interval_activity <- transform(avg_interval_activity, date_time =  as.POSIXct(paste("01.01.2014" , time_string, sep = " "), format = "%d.%m.%Y %H:%M"))
 ```
-```{r,echo=TRUE,results='hide'}
+
+```r
 ## time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the
 ## average number of steps taken, averaged across all days (y-axis)
 
@@ -107,21 +125,32 @@ dev.off()
 
  The 5-minute interval, that contains the maximum average number of steps
 
-```{r, echo=TRUE}
+
+```r
 avg_interval_activity[avg_interval_activity$steps == max(avg_interval_activity$steps),]$interval
+```
+
+```
+## [1] 835
 ```
 
 ## Imputing missing values
 
  Total number of rows with NA
 
-```{r, echo=TRUE}
+
+```r
 nrow(activity[!complete.cases(activity),])
+```
+
+```
+## [1] 2304
 ```
 
 Create a new dataset that is equal to the original dataset but with the missing data filled in with the mean for that 5-minute interval.
 
-```{r,echo=TRUE}
+
+```r
 ## function for Average steps values for each 5-minute interval
 getAverageSteps <- function(intervals){
     avg_steps <- vector()
@@ -138,17 +167,17 @@ getAverageSteps <- function(intervals){
 activity_filled <- activity
 ##Fill missing values with with the mean for that 5-minute interval
 activity_filled[!complete.cases(activity_filled),]$steps <- getAverageSteps(activity_filled[!complete.cases(activity_filled),]$interval)
-
 ```
 
 Sum the total number of steps taken per day after filling missing values, and generate a histogram
 
-```{r, echo=TRUE}
+
+```r
 activity_filled <- transform(activity_filled, date = as.Date(activity_filled$date))
 sum_activity_filled <- aggregate(steps~date, activity_filled, sum)
 ```
-```{r,echo=TRUE,results='hide'}
 
+```r
 png(file.path(figure.directory,"figure3.png"), width = 800, height= 800)
 
 ggplot(sum_activity_filled) + geom_histogram(aes(x=date, weight=steps), binwidth = 2) + xlab("Activity date") + ylab("Total steps taken")
@@ -159,21 +188,32 @@ dev.off()
 
 Mean of the total number of steps taken per day after filling missing values
 
-```{r, echo=TRUE}
+
+```r
 mean(sum_activity_filled$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
  Median of the total number of steps taken per day after filling missing values
 
-```{r, echo=TRUE}
+
+```r
 median(sum_activity_filled$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
  Add factor of "Weekend" or "Weekday"
 
-```{r,echo=TRUE}
+
+```r
 days <- weekdays(activity_filled$date)
 
 ##function to mark Weekend or Weekday
@@ -196,12 +236,12 @@ WeekDayOrEnd <- function(days){
 activity_filled$dayOrEnd <- WeekDayOrEnd(days)
 
 activity_filled <- transform(activity_filled, dayOrEnd = factor(dayOrEnd))
-
 ```
 
 A time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
-```{r, echo=TRUE}
+
+```r
 ## Create a dataframe with the average number of steps for each 5 minute interval
 avg_interval_activity_filled <- aggregate(steps ~ dayOrEnd +interval, activity_filled, mean)
 
@@ -211,7 +251,8 @@ avg_interval_activity_filled <- transform(avg_interval_activity_filled, time_str
 avg_interval_activity_filled <- transform(avg_interval_activity_filled, date_time =  as.POSIXct(paste("01.01.2014" , time_string, sep = " "), format = "%d.%m.%Y %H:%M"))
 ```
 
-```{r,echo=TRUE,results='hide'}
+
+```r
 ## time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the
 ## average number of steps taken, averaged across all days (y-axis)
 
@@ -222,7 +263,6 @@ ggplot(data = avg_interval_activity_filled, aes(date_time,steps)) +
     scale_x_datetime(labels = date_format("%H:%M"),breaks = "2 hour") + facet_grid(dayOrEnd ~ .) + xlab("Start time of measuring steps") + ylab("Average number of steps")
 
 dev.off()
-
 ```
 ![Figure 4](./figure/figure4.png)
 
